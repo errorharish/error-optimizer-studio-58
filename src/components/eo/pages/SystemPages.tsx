@@ -13,6 +13,7 @@ export function InputOptimizerPage() {
   const [mode, setMode] = useState("NORMAL");
   const [sel, setSel] = useState<Set<string>>(new Set());
   const test = useSimRun(2500);
+  const [run, setRun] = useState(false);
   const [tested, setTested] = useState(false);
   const List = ({ title, sub, items }: { title: string; sub: string; items: string[] }) => (
     <Card>
@@ -32,14 +33,16 @@ export function InputOptimizerPage() {
         <List title="NORMAL INPUT OPTIMIZATION" sub="Safe, policy-approved input tuning available for this system." items={NORMAL_INPUT} />
         <List title="ADVANCED INPUT OPTIMIZATION" sub="Deeper system-level input tuning for users who want fine-grained control." items={ADV_INPUT} />
       </Cols>
-      <Card><SectionTitle title="REAL INPUT TEST & JITTER MEASUREMENT" sub="Measures physical mouse intervals, high-precision timer ticks, and timing variance." right={["5 SEC TEST", "10 SEC TEST", "30 SEC TEST"].map((x) => <Btn key={x} size="sm" disabled={test.running} onClick={() => test.start(() => setTested(true))}>{x}</Btn>)} />
+      <Card><SectionTitle title="REAL INPUT TEST & JITTER MEASUREMENT" sub="Sample input-test flow — no physical input measurements are captured." right={["5 SEC TEST", "10 SEC TEST", "30 SEC TEST"].map((x) => <Btn key={x} size="sm" disabled={test.running} onClick={() => test.start(() => setTested(true))}>{x}</Btn>)} />
         {test.running && <Bar value={test.progress ?? 0} className="mb-3" />}
-        <StatTiles items={[{ label: "SAMPLES", value: tested ? "4,812" : "—" }, { label: "AVG INTERVAL", value: tested ? "1.02 ms" : "—" }, { label: "FREQUENCY", value: tested ? "980 Hz" : "—" }, { label: "JITTER", value: tested ? "0.08 ms" : "—", tone: "success" }, { label: "TIMER RES", value: "0.5 ms" }]} />
-        <p className="mt-2 text-[10.5px] text-warning">Simulated measurement — move your mouse in the native app to collect real samples.</p>
+        <StatTiles items={[{ label: "SAMPLES", value: "—" }, { label: "AVG INTERVAL", value: "—" }, { label: "FREQUENCY", value: "—" }, { label: "JITTER", value: "—", tone: "success" }, { label: "TIMER RES", value: "0.5 ms" }]} />
+        <p className="mt-2 text-[10.5px] text-warning">{tested ? "Simulated test finished. No measurements were collected." : "Run the simulated test to preview its progress; real results require the native app."}</p>
       </Card>
-      <Card><SectionTitle title="BEFORE / AFTER OPTIMIZATION PROOF" sub="Directional verification comparing baseline system state against post-optimization state." />
+      <Card><SectionTitle title="ILLUSTRATIVE BEFORE / AFTER STATES" sub="Demo values only — not benchmark results or evidence of an improvement." />
         <Cols cols="1fr 40px 1fr"><div className="rounded-lg border border-border bg-window p-3"><Label className="mb-2">BEFORE OPTIMIZATION</Label><KV k="Polling Rate:" v="500 Hz" /><KV k="Timer Resolution:" v="15.6 ms" /><KV k="Measured Jitter:" v="0.42 ms" /></div><div className="flex items-center justify-center text-cyan">→</div><div className="rounded-lg border border-success/30 bg-window p-3"><Label className="mb-2 text-success">AFTER OPTIMIZATION</Label><KV k="Polling Rate:" v="1000 Hz" /><KV k="Timer Resolution:" v="0.5 ms" /><KV k="Measured Jitter:" v="0.08 ms" /></div></Cols>
       </Card>
+      <div className="flex justify-end"><Btn variant="primary" disabled={mode === "CUSTOM" && !sel.size} onClick={() => setRun(true)}>Review input settings</Btn></div>
+      <RunModal open={run} onClose={() => setRun(false)} profile="Input Optimizer" count={mode === "NORMAL" ? NORMAL_INPUT.length : sel.size} />
       <Details title="VIEW TECHNICAL DETAILS — DIAGNOSTIC TELEMETRY BREAKDOWN"><p className="text-xs text-muted-foreground">Per-item diagnostic readback (registry location, current vs target value) is listed here in the native app. Hidden by default.</p></Details>
       <SimNotice />
     </div>
@@ -53,7 +56,7 @@ export function SystemInfoPage() {
   const findings = [["PASS", "HARDWARE", "CPU thermals within envelope"], ["PASS", "SECURITY", "UEFI Secure Boot enabled"], ["WARNINGS", "SECURITY", "Core Isolation (HVCI) is off"], ["PASS", "HARDWARE", "Memory running at EXPO speed"], ["WARNINGS", "HARDWARE", "Primary drive 46% used"]];
   return (
     <div className="space-y-4">
-      <PageHeader title="System Telemetry" badges={<Badge tone="cyan">HARDWARE & DIAGNOSTICS</Badge>} sub="Real-time hardware, Windows architecture, and system health diagnostics." actions={<Btn onClick={() => simulate("Refresh telemetry")}>Refresh</Btn>} />
+      <PageHeader title="System Telemetry" badges={<Badge tone="cyan">HARDWARE & DIAGNOSTICS</Badge>} sub="Sample hardware, Windows architecture, and system health diagnostics." actions={<Btn onClick={() => simulate("Refresh telemetry")}>Refresh</Btn>} />
       <Card className="flex flex-wrap items-center gap-4 py-3">{["Hardware: OK", "Windows: OK", "Security: 1 warning", "Storage: OK", "Performance: OK", "Drivers: OK"].map((x) => <span key={x} className="text-[12px] font-semibold"><span className={x.includes("warning") ? "text-warning" : "text-success"}>●</span> {x}</span>)}<Btn size="sm" className="ml-auto" onClick={() => setOpen(true)}>System health analysis</Btn></Card>
       <SectionTitle title="ESSENTIAL HARDWARE OVERVIEW" />
       <div className="grid grid-cols-3 gap-3">{[["PROCESSOR (CPU)", HW.cpu, HW.cpuSub], ["GRAPHICS (GPU)", HW.gpu, HW.gpuSub], ["SYSTEM MEMORY", HW.ram, HW.ramSub], ["PRIMARY STORAGE", HW.storage, HW.storageSub], ["WINDOWS OS", HW.os, "Build 26100 · x64"], ["POWER & CHASSIS", "Desktop · AC power", "Ultimate Performance plan"]].map(([a, b, c]) => <Card key={a} className="p-4"><Label className="text-cyan">{a}</Label><div className="mt-2 text-sm font-bold">{b}</div><div className="text-[11.5px] text-muted-foreground">{c}</div></Card>)}</div>
@@ -100,7 +103,7 @@ export function RegistryTweakPage() {
         <StatTiles items={[{ label: "TOTAL", value: list.length, sub: "Catalog tweaks" }, { label: "APPLICABLE", value: list.length - 3, sub: "Supported on PC", tone: "cyan" }, { label: "SELECTED", value: sel.size, sub: "Manual selection", tone: "primary" }, { label: "OPTIMIZED", value: 6, sub: "Verified optimal", tone: "success" }, { label: "NOT APPLICABLE", value: 3, sub: "Unsupported/Absent" }, { label: "FAILED", value: 0, sub: "Attempt errors", tone: "danger" }]} />
         <Card><div className="mb-3"><SearchBox placeholder="🔍 Search registry optimizations..." value={q} onChange={setQ} /></div><Chips options={REG_CATS} value={cat} onChange={setCat} />
           <div className="mt-3 flex justify-end gap-1.5"><Btn size="sm" variant="ghost" onClick={() => setSel(new Set())}>Deselect all</Btn><Btn size="sm" onClick={() => simulate("Scan")}>↻ Scan</Btn><Btn size="sm" onClick={() => simulate("Save profile")}>💾 Save profile</Btn><Btn size="sm" variant="primary" disabled={!sel.size} onClick={() => setRun(true)}>Apply selected</Btn></div></Card>
-        <Cols cols="1fr 320px"><Card><Label className="mb-3 text-foreground">REGISTRY OPTIMIZATION TARGETS</Label><div className="space-y-1.5">{vis.map((i) => <div key={i.id} className="flex items-center gap-3 rounded-lg border border-border bg-window px-3 py-2.5 text-[12.5px]"><Check on={sel.has(i.id)} onChange={() => setSel((s) => { const n = new Set(s); n.has(i.id) ? n.delete(i.id) : n.add(i.id); return n; })} /><button className="flex-1 text-left hover:text-cyan" onClick={() => setDetail(i)}>{i.name}</button><Badge>{i.cat}</Badge><Badge tone={i.state === "OPTIMIZED" ? "success" : i.state === "PENDING" ? "warning" : "muted"}>{i.state}</Badge></div>)}</div></Card>
+        <Cols cols="1fr 320px"><Card><Label className="mb-3 text-foreground">REGISTRY OPTIMIZATION TARGETS</Label><div className="space-y-1.5">{vis.map((i) => <div key={i.id} className="flex items-center gap-3 rounded-lg border border-border bg-window px-3 py-2.5 text-[12.5px]"><Check label={`Select ${i.name}`} on={sel.has(i.id)} onChange={() => setSel((s) => { const n = new Set(s); n.has(i.id) ? n.delete(i.id) : n.add(i.id); return n; })} /><button className="flex-1 text-left hover:text-cyan" onClick={() => setDetail(i)}>{i.name}</button><Badge>{i.cat}</Badge><Badge tone={i.state === "OPTIMIZED" ? "success" : i.state === "PENDING" ? "warning" : "muted"}>{i.state}</Badge></div>)}</div></Card>
           <Card><Label className="mb-3 text-foreground">ACTIVITY LOG</Label><div className="space-y-1 font-mono text-[11px] text-muted-foreground"><div>[sim] registry scan complete</div><div>[sim] {list.length} targets evaluated</div></div></Card></Cols>
       </>)}
       <SimNotice />
@@ -118,8 +121,8 @@ export function RegistryValuesPage() {
     <div className="space-y-4">
       <PageHeader title="Registry Values" sub="Hardware-aware Windows registry value configuration, live readback and verification." />
       <div className="grid grid-cols-2 gap-3">
-        <Link to="/$page" params={{ page: "registry-values-ram" }} className="eo-card p-6 transition-all hover:border-cyan/50 hover:shadow-[var(--shadow-glow)]"><Badge tone="cyan">RAM</Badge><div className="mt-3 text-lg font-bold">RAM REGISTRY VALUES</div><p className="mt-1 text-xs text-muted-foreground">Service Host (svchost) split threshold configuration based on installed RAM.</p></Link>
-        <Link to="/$page" params={{ page: "gpu-registry-values" }} className="eo-card p-6 transition-all hover:border-cyan/50 hover:shadow-[var(--shadow-glow)]"><Badge tone="cyan">GPU</Badge><div className="mt-3 text-lg font-bold">GPU REGISTRY VALUES</div><p className="mt-1 text-xs text-muted-foreground">Universal, NVIDIA and AMD hardware-aware GPU registry groups.</p></Link>
+        <Link to="/$page" params={{ page: "registry-values-ram" }} className="eo-card eo-depth p-6 transition-all hover:border-cyan/50 hover:shadow-[var(--shadow-glow)]"><Badge tone="cyan">RAM</Badge><div className="mt-3 text-lg font-bold">RAM REGISTRY VALUES</div><p className="mt-1 text-xs text-muted-foreground">Service Host (svchost) split threshold configuration based on installed RAM.</p></Link>
+        <Link to="/$page" params={{ page: "gpu-registry-values" }} className="eo-card eo-depth p-6 transition-all hover:border-cyan/50 hover:shadow-[var(--shadow-glow)]"><Badge tone="cyan">GPU</Badge><div className="mt-3 text-lg font-bold">GPU REGISTRY VALUES</div><p className="mt-1 text-xs text-muted-foreground">Universal, NVIDIA and AMD hardware-aware GPU registry groups.</p></Link>
       </div>
     </div>
   );
@@ -136,8 +139,8 @@ export function RegistryValuesRamPage() {
       <Card className="flex items-center justify-between"><div><Label>TARGET VALUE</Label><div className="mt-1 text-sm font-semibold">Service Host split threshold</div></div><Btn size="sm" variant="ghost" onClick={() => setOpen(true)}>Details</Btn></Card>
       <Cols cols="1fr 1fr" gap={14}>
         <Card><Label className="text-foreground">CHOOSE YOUR RAM SIZE</Label><p className="mt-1 mb-3 text-xs text-muted-foreground">Select the physical RAM installed in your system.</p>
-          <div className="flex items-center gap-3"><select value={ram} onChange={(e) => setRam(+e.target.value)} className="h-9 flex-1 rounded-lg border border-border bg-window px-3 text-sm">{RAM_SIZES.map((r) => <option key={r} value={r}>{r} GB</option>)}</select><Badge tone="cyan">Detected: 32 GB</Badge></div>
-          {ram !== 32 && <p className="mt-2 text-[11.5px] text-warning">⚠️ Selected RAM differs from detected hardware. Verify before applying.</p>}
+          <div className="flex items-center gap-3"><select value={ram} onChange={(e) => setRam(+e.target.value)} className="h-9 flex-1 rounded-lg border border-border bg-window px-3 text-sm">{RAM_SIZES.map((r) => <option key={r} value={r}>{r} GB</option>)}</select><Badge tone="cyan">Demo: 32 GB</Badge></div>
+          {ram !== 32 && <p className="mt-2 text-[11.5px] text-warning">⚠️ Selected RAM differs from sample hardware. Verify before applying.</p>}
           <div className="mt-4 rounded-lg border border-border bg-window p-3"><Label className="mb-1">TARGET CONFIGURATION</Label><KV k="Hex Value:" v={`0x${kb.toString(16).toUpperCase()}`} mono /><KV k="Decimal KB:" v={kb.toLocaleString()} mono /><KV k="Formula:" v={`${ram} GB × 1024 × 1024`} mono /></div></Card>
         <Card><Label className="text-foreground">CURRENT REGISTRY STATE</Label><p className="mt-1 mb-3 text-xs text-muted-foreground">Live value read from Windows Registry (simulated).</p>
           <div className="rounded-lg border border-border bg-window p-3"><Label className="mb-1">READBACK VALUE</Label><KV k="Hex Value:" v="0x380000" mono /><KV k="Decimal KB:" v="3,670,016" mono /></div>
@@ -164,7 +167,7 @@ export function GpuRegistryValuesPage() {
   return (
     <div className="space-y-4">
       <PageHeader title="GPU Registry Values" sub="Hardware-aware GPU registry configuration, optimization and verification." actions={<><Link to="/$page" params={{ page: "registry-values" }}><Btn size="sm" variant="ghost">← Registry Values</Btn></Link><Btn onClick={() => simulate("Rescan GPU")}>Rescan GPU</Btn><Btn variant="primary" onClick={() => simulate("Apply all recommended")}>Apply all recommended</Btn></>} />
-      <Card><Label className="mb-3 text-foreground">DETECTED GRAPHICS HARDWARE</Label><div className="grid gap-3" style={{ gridTemplateColumns: "1fr 1.1fr 1.1fr 1.8fr" }}>{[["GPU Vendor", "NVIDIA"], ["Driver Version & Date", "566.36 · 2026-10"], ["WDDM Architecture", "WDDM 3.2"], ["OS Environment", HW.os]].map(([k, v]) => <div key={k}><Label className="text-[9px]">{k}</Label><div className="mt-0.5 text-sm font-semibold">{v}</div></div>)}</div><div className="mt-3"><Badge tone="success">Hardware Preemption Ready</Badge></div></Card>
+      <Card><Label className="mb-3 text-foreground">SAMPLE GRAPHICS HARDWARE</Label><div className="grid gap-3" style={{ gridTemplateColumns: "1fr 1.1fr 1.1fr 1.8fr" }}>{[["GPU Vendor", "NVIDIA"], ["Driver Version & Date", "566.36 · 2026-10"], ["WDDM Architecture", "WDDM 3.2"], ["OS Environment", HW.os]].map(([k, v]) => <div key={k}><Label className="text-[9px]">{k}</Label><div className="mt-0.5 text-sm font-semibold">{v}</div></div>)}</div><div className="mt-3"><Badge tone="success">Sample hardware profile</Badge></div></Card>
       <Card className="flex items-center gap-3 py-3"><Label>PROFILE POLICY:</Label><select value={policy} onChange={(e) => setPolicy(e.target.value)} className="h-8 rounded-lg border border-border bg-window px-2 text-sm">{["Recommended", "Performance", "Conservative"].map((p) => <option key={p}>{p}</option>)}</select></Card>
       <SectionTitle title="HARDWARE-AWARE OPTIMIZATION GROUPS" right={<><Btn size="sm" onClick={() => setSel(new Set(groups.filter((g) => g.detected).flatMap((g) => g.items)))}>Select all applicable</Btn><Btn size="sm" variant="ghost" onClick={() => setSel(new Set())}>Clear selection</Btn><Btn size="sm" variant="primary" disabled={!sel.size} onClick={() => simulate("Apply selected")}>Apply selected</Btn></>} />
       {groups.map((g) => (

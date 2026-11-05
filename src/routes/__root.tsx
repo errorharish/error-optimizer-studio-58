@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { AppearanceProvider } from "@/components/eo/Appearance";
 import { Shell } from "@/components/eo/Shell";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -121,10 +122,10 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Shell>
+      <AppearanceProvider><Shell>
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
-      </Shell>
+      </Shell></AppearanceProvider>
       <Toaster theme="dark" position="top-right" />
     </QueryClientProvider>
   );

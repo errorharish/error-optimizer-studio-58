@@ -1,13 +1,22 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useId, useState, type ReactNode } from "react";
 import type React from "react";
 import { cn } from "@/lib/utils";
 import type { Risk } from "@/lib/eo/data";
-import { X, ChevronDown, FlaskConical } from "lucide-react";
+import { X, ChevronDown, FlaskConical, Search } from "lucide-react";
 import { toast } from "sonner";
 
 /* ── Card (FigmaCardStyle / GlassCard) ── */
 export function Card({ className, children, glow, style }: { className?: string | undefined; children: ReactNode; glow?: boolean | undefined; style?: React.CSSProperties | undefined }) {
-  return <div style={style} className={cn("eo-card p-5", glow && "eo-glow", className)}>{children}</div>;
+  const ref = useRef<HTMLDivElement>(null);
+  return <div ref={ref} style={style} onPointerMove={(e) => {
+    const node = ref.current;
+    if (!node || e.pointerType !== "mouse" || node.querySelector("input, select") || document.documentElement.dataset.motion === "reduced" || document.documentElement.dataset.depth === "flat") return;
+    const box = node.getBoundingClientRect();
+    const x = (e.clientX - box.left) / box.width, y = (e.clientY - box.top) / box.height;
+    node.style.setProperty("--tilt-x", `${(0.5 - y) * 1.8}deg`);
+    node.style.setProperty("--tilt-y", `${(x - 0.5) * 1.8}deg`);
+    node.style.setProperty("--light-x", `${x * 100}%`);
+  }} onPointerLeave={() => { ref.current?.style.setProperty("--tilt-x", "0deg"); ref.current?.style.setProperty("--tilt-y", "0deg"); }} className={cn("eo-card eo-depth p-5", glow && "eo-glow", className)}>{children}</div>;
 }
 
 export function Label({ children, className }: { children: ReactNode; className?: string | undefined }) {
@@ -16,7 +25,7 @@ export function Label({ children, className }: { children: ReactNode; className?
 
 export function SectionTitle({ title, sub, right, badge }: { title: string; sub?: string | undefined; right?: ReactNode | undefined; badge?: ReactNode | undefined }) {
   return (
-    <div className="mb-4 flex items-start justify-between gap-4">
+    <div className="eo-section-title mb-4 flex flex-wrap items-start justify-between gap-4">
       <div>
         <div className="flex items-center gap-2">
           <span className="h-3.5 w-1 rounded-full bg-cyan" />
@@ -67,7 +76,9 @@ const btnCls: Record<BtnVariant, string> = {
 export function Btn({ variant = "secondary", children, onClick, className, size = "md", title, disabled }: { variant?: BtnVariant | undefined; children: ReactNode; onClick?: () => void | undefined; className?: string | undefined; size?: "sm" | "md" | "lg" | undefined; title?: string | undefined; disabled?: boolean | undefined }) {
   return (
     <button
+      type="button"
       title={title}
+      aria-label={title}
       disabled={disabled}
       onClick={onClick}
       className={cn(
@@ -85,7 +96,7 @@ export function Btn({ variant = "secondary", children, onClick, className, size 
 /* ── Page header (every View starts with Grid cols=*,Auto: title block + actions) ── */
 export function PageHeader({ title, sub, badges, actions, accent = "bg-cyan" }: { title: string; sub?: string | undefined; badges?: ReactNode | undefined; actions?: ReactNode | undefined; accent?: string | undefined }) {
   return (
-    <div className="mb-5 flex flex-wrap items-start justify-between gap-4">
+    <div className="eo-page-header mb-5 flex flex-wrap items-start justify-between gap-4">
       <div className="flex gap-3">
         <span className={cn("mt-1 h-9 w-1 rounded-full", accent)} />
         <div>
@@ -105,9 +116,9 @@ export function PageHeader({ title, sub, badges, actions, accent = "bg-cyan" }: 
 export function StatTiles({ items, cols }: { items: { label: string; value: ReactNode; sub?: string | undefined; tone?: Tone | undefined }[]; cols?: number | undefined }) {
   const tc: Record<Tone, string> = { cyan: "text-cyan", primary: "text-primary-hover", success: "text-success", warning: "text-warning", danger: "text-destructive", muted: "text-foreground" };
   return (
-    <div className="grid gap-2.5" style={{ gridTemplateColumns: `repeat(${cols ?? items.length}, minmax(0,1fr))` }}>
+    <div className="eo-stat-grid grid gap-2.5" style={{ gridTemplateColumns: `repeat(${cols ?? items.length}, minmax(0,1fr))` }}>
       {items.map((s) => (
-        <div key={s.label} className="eo-card p-3.5">
+        <div key={s.label} className="eo-card eo-stat p-3.5">
           <Label className="text-[9.5px]">{s.label}</Label>
           <div className={cn("mt-1.5 text-2xl font-bold tabular-nums", tc[s.tone ?? "muted"])}>{s.value}</div>
           {s.sub && <div className="mt-0.5 text-[11px] text-subtle">{s.sub}</div>}
@@ -124,6 +135,8 @@ export function Chips({ options, value, onChange, className }: { options: string
       {options.map((o) => (
         <button
           key={o}
+          type="button"
+          aria-pressed={value === o}
           onClick={() => onChange(o)}
           className={cn(
             "h-7 rounded-md border px-2.5 text-[10px] font-bold tracking-[0.08em] uppercase transition-colors",
@@ -139,35 +152,36 @@ export function Chips({ options, value, onChange, className }: { options: string
 
 export function SearchBox({ placeholder, value, onChange }: { placeholder: string; value: string; onChange: (v: string) => void }) {
   return (
-    <input
+    <div className="eo-search relative"><Search className="pointer-events-none absolute left-3 top-3 h-3.5 w-3.5 text-subtle" /><input
+      aria-label={placeholder}
       value={value}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
-      className="h-9 w-full rounded-lg border border-border bg-window px-3 text-sm text-foreground placeholder:text-subtle outline-none focus:border-cyan/60"
-    />
+      className="h-9 w-full rounded-lg border border-border bg-window pl-9 pr-3 text-sm text-foreground placeholder:text-subtle outline-none focus:border-cyan/60"
+    /></div>
   );
 }
 
 export function Bar({ value, tone = "cyan", className }: { value: number; tone?: Tone | undefined; className?: string | undefined }) {
   const bg: Record<Tone, string> = { cyan: "bg-cyan", primary: "bg-primary", success: "bg-success", warning: "bg-warning", danger: "bg-destructive", muted: "bg-subtle" };
   return (
-    <div className={cn("h-1.5 w-full overflow-hidden rounded-full bg-window", className)}>
+    <div role="progressbar" aria-label="Progress" aria-valuenow={Math.round(value)} aria-valuemin={0} aria-valuemax={100} className={cn("h-1.5 w-full overflow-hidden rounded-full bg-window", className)}>
       <div className={cn("h-full rounded-full transition-all duration-500", bg[tone])} style={{ width: `${Math.min(100, Math.max(0, value))}%` }} />
     </div>
   );
 }
 
 /* ── Toggle (PremiumToggle) & Check ── */
-export function Toggle({ on, onChange }: { on: boolean; onChange: (v: boolean) => void }) {
+export function Toggle({ on, onChange, label = "Toggle setting" }: { on: boolean; onChange: (v: boolean) => void; label?: string }) {
   return (
-    <button onClick={() => onChange(!on)} className={cn("relative h-5 w-9 shrink-0 rounded-full border transition-colors", on ? "border-cyan/60 bg-cyan/30" : "border-border-strong bg-window")}>
+    <button type="button" role="switch" aria-checked={on} aria-label={label} onClick={() => onChange(!on)} className={cn("relative h-5 w-9 shrink-0 rounded-full border transition-colors", on ? "border-cyan/60 bg-cyan/30" : "border-border-strong bg-window")}>
       <span className={cn("absolute top-0.5 h-3.5 w-3.5 rounded-full transition-all", on ? "left-[18px] bg-cyan" : "left-0.5 bg-subtle")} />
     </button>
   );
 }
-export function Check({ on, onChange }: { on: boolean; onChange: (v: boolean) => void }) {
+export function Check({ on, onChange, label = "Select item" }: { on: boolean; onChange: (v: boolean) => void; label?: string }) {
   return (
-    <button onClick={() => onChange(!on)} className={cn("flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded border text-[10px] font-black", on ? "border-cyan bg-cyan text-sidebar-primary-foreground" : "border-border-strong bg-window")}>
+    <button type="button" role="checkbox" aria-checked={on} aria-label={label} onClick={() => onChange(!on)} className={cn("eo-check flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded border text-[10px] font-black", on ? "border-cyan bg-cyan text-sidebar-primary-foreground" : "border-border-strong bg-window")}>
       {on ? "✓" : ""}
     </button>
   );
@@ -188,7 +202,7 @@ export function Details({ title = "ADVANCED DETAILS", children }: { title?: stri
   const [open, setOpen] = useState(false);
   return (
     <div className="eo-card overflow-hidden">
-      <button onClick={() => setOpen(!open)} className="flex w-full items-center justify-between px-5 py-3.5">
+      <button aria-expanded={open} onClick={() => setOpen(!open)} className="flex w-full items-center justify-between px-5 py-3.5">
         <span className="eo-label text-muted-foreground">{title}</span>
         <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform", open && "rotate-180")} />
       </button>
@@ -199,26 +213,40 @@ export function Details({ title = "ADVANCED DETAILS", children }: { title?: stri
 
 /* ── Modal overlay (WPF Popup/Grid overlays) ── */
 export function Modal({ open, onClose, title, sub, children, footer, width = "max-w-2xl" }: { open: boolean; onClose: () => void; title: string; sub?: string | undefined; children: ReactNode; footer?: ReactNode | undefined; width?: string | undefined }) {
+  const dialog = useRef<HTMLDivElement>(null);
+  const closeRef = useRef(onClose);
+  closeRef.current = onClose;
+  const titleId = useId();
+  const [visible, setVisible] = useState(open);
   useEffect(() => {
-    if (!open) return;
-    const h = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    if (open) { setVisible(true); return; }
+    const timer = setTimeout(() => setVisible(false), 150);
+    return () => clearTimeout(timer);
+  }, [open]);
+  useEffect(() => {
+    if (!open || !visible) return;
+    const previous = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const elements = () => Array.from(dialog.current?.querySelectorAll<HTMLElement>('button:not([disabled]), input, select, a[href], [tabindex="0"]') ?? []);
+    elements()[0]?.focus();
+    const h = (e: KeyboardEvent) => {
+      if (e.key === "Escape") { e.preventDefault(); closeRef.current(); }
+      if (e.key !== "Tab") return;
+      const targets = elements(), first = targets[0], last = targets.at(-1);
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last?.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first?.focus(); }
+    };
     window.addEventListener("keydown", h);
-    return () => window.removeEventListener("keydown", h);
-  }, [open, onClose]);
-  if (!open) return null;
+    return () => { window.removeEventListener("keydown", h); previous?.focus(); };
+  }, [open, visible]);
+  if (!visible) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-6 backdrop-blur-sm" onClick={onClose}>
-      <div className={cn("eo-card eo-glow eo-enter flex max-h-[86vh] w-full flex-col p-0", width)} onClick={(e) => e.stopPropagation()}>
+    <div className={cn("eo-overlay fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-6 backdrop-blur-sm", !open && "eo-dismiss")} onClick={onClose}>
+      <div ref={dialog} role="dialog" aria-modal="true" aria-labelledby={titleId} className={cn("eo-card eo-modal flex max-h-[86vh] w-full flex-col p-0", width)} onClick={(e) => e.stopPropagation()}>
         <div className="flex items-start justify-between gap-4 border-b border-border px-6 py-4">
-          <div>
-            <h2 className="text-base font-bold tracking-[0.06em] uppercase">{title}</h2>
-            {sub && <p className="mt-0.5 text-xs text-muted-foreground">{sub}</p>}
-          </div>
-          <button onClick={onClose} className="rounded-md p-1 text-muted-foreground hover:bg-elevated hover:text-foreground" title="Close (Esc)">
-            <X className="h-4 w-4" />
-          </button>
+          <div><h2 id={titleId} className="text-base font-bold uppercase">{title}</h2>{sub && <p className="mt-1 text-xs text-muted-foreground">{sub}</p>}</div>
+          <Btn onClick={onClose} size="sm" variant="ghost" title="Close dialog"><X className="h-4 w-4" /></Btn>
         </div>
-        <div className="overflow-y-auto px-6 py-5">{children}</div>
+        <div className="min-h-0 overflow-y-auto px-6 py-5">{children}</div>
         {footer && <div className="flex flex-wrap items-center justify-end gap-2 border-t border-border px-6 py-3.5">{footer}</div>}
       </div>
     </div>
@@ -241,22 +269,29 @@ export function simulate(label: string | undefined) {
 
 export function useSimRun(durationMs = 2200) {
   const [progress, setProgress] = useState<number | null>(null);
+  const interval = useRef<ReturnType<typeof setInterval> | null>(null);
+  const delay = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const cancel = () => {
+    if (interval.current) clearInterval(interval.current);
+    if (delay.current) clearTimeout(delay.current);
+    interval.current = null; delay.current = null; setProgress(null);
+  };
+  useEffect(() => () => { if (interval.current) clearInterval(interval.current); if (delay.current) clearTimeout(delay.current); }, []);
   const start = (onDone?: () => void) => {
+    if (interval.current || delay.current) return;
     setProgress(0);
     const t0 = Date.now();
-    const id = setInterval(() => {
+    interval.current = setInterval(() => {
       const p = Math.min(100, ((Date.now() - t0) / durationMs) * 100);
       setProgress(p);
       if (p >= 100) {
-        clearInterval(id);
-        setTimeout(() => {
-          setProgress(null);
-          onDone?.();
-        }, 300);
+        if (interval.current) clearInterval(interval.current);
+        interval.current = null;
+        delay.current = setTimeout(() => { delay.current = null; setProgress(null); onDone?.(); }, 200);
       }
-    }, 60);
+    }, 80);
   };
-  return { progress, running: progress !== null, start };
+  return { progress, running: progress !== null, start, cancel };
 }
 
 export function EmptyState({ title, sub, action }: { title: string; sub: string; action?: ReactNode | undefined }) {

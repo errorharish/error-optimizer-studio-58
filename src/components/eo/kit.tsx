@@ -174,7 +174,7 @@ export function Check({ on, onChange }: { on: boolean; onChange: (v: boolean) =>
 }
 
 /* ── Key / value row ── */
-export function KV({ k, v, mono }: { k: string; v: ReactNode; mono?: boolean | undefined }) {
+export function KV({ k, v, mono }: { k: string | undefined; v: ReactNode; mono?: boolean | undefined }) {
   return (
     <div className="flex items-baseline justify-between gap-3 border-b border-border/60 py-1.5 text-[12.5px] last:border-0">
       <span className="text-muted-foreground">{k}</span>
@@ -235,7 +235,7 @@ export function SimNotice({ children }: { children?: ReactNode | undefined }) {
   );
 }
 
-export function simulate(label: string) {
+export function simulate(label: string | undefined) {
   toast(`${label} — simulated`, { description: "Prototype only. No real system changes were made." });
 }
 

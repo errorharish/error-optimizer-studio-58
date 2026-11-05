@@ -74,7 +74,7 @@ export function TierPage({ slug }: { slug: string }) {
       {t.toolbox === "debloat" && (
         <Card><SectionTitle title="DEBLOAT TOOLBOX" right={<Btn size="sm" onClick={() => setBlock(true)}>Customize blocklist</Btn>} />
           <Chips options={Object.keys(DEBLOAT_TOOLS)} value={toolCat} onChange={setToolCat} />
-          <div className="mt-3 grid grid-cols-2 gap-2.5">{DEBLOAT_TOOLS[toolCat].map((d) => <div key={d.name} className="flex items-start justify-between gap-3 rounded-xl border border-border bg-window p-3.5"><div><div className="text-[13px] font-semibold">{d.name}</div><p className="text-[11.5px] text-muted-foreground">{d.desc}</p></div><div className="flex flex-col items-end gap-2"><RiskBadge risk={d.risk} /><Btn size="sm" onClick={() => simulate(d.name)}>Run</Btn></div></div>)}</div>
+          <div className="mt-3 grid grid-cols-2 gap-2.5">{(DEBLOAT_TOOLS[toolCat] ?? []).map((d) => <div key={d.name} className="flex items-start justify-between gap-3 rounded-xl border border-border bg-window p-3.5"><div><div className="text-[13px] font-semibold">{d.name}</div><p className="text-[11.5px] text-muted-foreground">{d.desc}</p></div><div className="flex flex-col items-end gap-2"><RiskBadge risk={d.risk} /><Btn size="sm" onClick={() => simulate(d.name)}>Run</Btn></div></div>)}</div>
         </Card>
       )}
 

@@ -91,7 +91,7 @@ export function BackupRestorePage() {
 }
 
 /* ───────── SETTINGS ───────── */
-function Row({ t, s, children }: { t: string; s: string; children: ReactNode }) {
+function Row({ t, s, children }: { t: string | undefined; s: string | undefined; children: ReactNode }) {
   return <div className="grid items-center gap-4 border-b border-border py-3 last:border-0" style={{ gridTemplateColumns: "220px 1fr auto" }}><div><div className="text-[13px] font-semibold">{t}</div><div className="text-[11px] text-subtle">{s}</div></div><div />{children}</div>;
 }
 function Tog({ init = true }: { init?: boolean }) { const [v, setV] = useState(init); return <Toggle on={v} onChange={setV} />; }
@@ -164,7 +164,7 @@ export function PerformanceTuningPage() {
   return (
     <div className="space-y-4">
       <PageHeader title="Performance Tuning" sub="Optional CPU and GPU performance tuning for supported hardware." actions={<><Btn variant="ghost" onClick={() => simulate("Revert to stock")}>Revert to stock</Btn><Btn variant="ghost" onClick={() => setGuide(true)}>Guide</Btn><Btn onClick={() => simulate("Rescan")}>Rescan</Btn></>} />
-      <Cols cols="1fr 1fr" gap={14}>{[["CPU PERFORMANCE", HW.cpu, "42°C"], ["GPU PERFORMANCE", HW.gpu, "44°C"]].map(([t, n, temp]) => <Card key={t}><div className="mb-3 flex items-center justify-between"><Label className="text-foreground">{t}</Label><Badge tone="success">SUPPORTED</Badge></div><div className="text-sm font-semibold">{n}</div><div className="mt-3 grid grid-cols-2 gap-2"><KV k="CURRENT STATE" v="Stock" /><KV k="TEMPERATURE" v={temp} /></div><Btn variant="primary" className="mt-4 w-full" onClick={() => simulate(`Start ${t}`)}>Start {t.split(" ")[0]} tuning</Btn></Card>)}</Cols>
+      <Cols cols="1fr 1fr" gap={14}>{[["CPU PERFORMANCE", HW.cpu, "42°C"], ["GPU PERFORMANCE", HW.gpu, "44°C"]].map(([t, n, temp]) => <Card key={t}><div className="mb-3 flex items-center justify-between"><Label className="text-foreground">{t}</Label><Badge tone="success">SUPPORTED</Badge></div><div className="text-sm font-semibold">{n}</div><div className="mt-3 grid grid-cols-2 gap-2"><KV k="CURRENT STATE" v="Stock" /><KV k="TEMPERATURE" v={temp} /></div><Btn variant="primary" className="mt-4 w-full" onClick={() => simulate(`Start ${t}`)}>Start {t?.split(" ")[0]} tuning</Btn></Card>)}</Cols>
       <Card className="grid items-center gap-4" style={{ gridTemplateColumns: "1fr auto 1fr auto 1fr" } as React.CSSProperties}>{[["THERMAL PROTECTION", "Active"], ["STABILITY MONITORING", "Ready"], ["POWER SOURCE", "AC"]].map(([k, v], i) => <Fragment key={k}><div><Label className="text-[9px]">{k}</Label><div className="text-sm font-semibold text-success">{v}</div></div>{i < 2 && <div className="h-8 w-px bg-border" />}</Fragment>)}</Card>
       <Card className="flex items-center justify-between"><div><Label>SESSION FLOW:</Label><div className="mt-1 text-[13px] font-semibold">1. CHECK · 2. TEST · 3. TUNE · 4. VERIFY · 5. DECIDE</div></div><Btn variant="danger" size="sm">Stop</Btn></Card>
       <Bar value={0} />

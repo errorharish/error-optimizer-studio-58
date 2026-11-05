@@ -27,5 +27,5 @@ export const Route = createFileRoute("/$page")({
 function PageRoute() {
   const { page } = Route.useParams();
   const C = PAGE_COMPONENTS[page];
-  return <>{C()}</>;
+  return <>{C ? C() : null}</>;
 }

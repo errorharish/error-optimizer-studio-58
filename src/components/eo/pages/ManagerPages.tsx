@@ -90,7 +90,7 @@ export function NetworkPage() {
   const [q, setQ] = useState("");
   const t = useSimRun(3000);
   const [tested, setTested] = useState(false);
-  const vis = NET.filter((n) => n[0].toLowerCase().includes(q.toLowerCase()) && (f === "ALL" || n[1] === f || n[2] === f));
+  const vis = NET.filter((n) => n[0]!.toLowerCase().includes(q.toLowerCase()) && (f === "ALL" || n[1] === f || n[2] === f));
   return (
     <div className="space-y-4">
       <PageHeader title="Network Boost" sub="Analyze and optimize the Windows network stack for lower latency, minimal jitter and stable throughput." actions={<><Btn variant="primary" disabled={t.running} onClick={() => t.start(() => setTested(true))}>⚡ Run network test</Btn><Btn variant="ghost" onClick={() => simulate("Restore backup")}>↺ Restore backup</Btn><Btn variant="ghost" onClick={() => simulate("Refresh")}>↻ Refresh</Btn></>} />

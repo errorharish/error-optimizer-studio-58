@@ -99,7 +99,7 @@ export function TierPage({ slug }: { slug: string }) {
         </Card>
       )}
 
-      <Card className="py-3"><button className="flex w-full items-center justify-between" onClick={() => setLogsOpen(!logsOpen)}><Label>ADVANCED LOGS & DIAGNOSTICS</Label><span className="flex gap-1.5"><Btn size="sm" variant="ghost" onClick={() => simulate("Copy logs")}>Copy logs</Btn><Btn size="sm" variant="ghost">Clear</Btn><Btn size="sm" variant="ghost">Expand / Collapse</Btn></span></button>
+      <Card className="py-3"><div className="flex w-full items-center justify-between"><Label>ADVANCED LOGS & DIAGNOSTICS</Label><span className="flex gap-1.5"><Btn size="sm" variant="ghost" onClick={() => simulate("Copy logs")}>Copy logs</Btn><Btn size="sm" variant="ghost">Clear</Btn><Btn size="sm" variant="ghost" onClick={() => setLogsOpen(!logsOpen)}>Expand / Collapse</Btn></span></div>
         {logsOpen && <pre className="mt-3 rounded-lg bg-background p-3 font-mono text-[11px] text-muted-foreground">[sim] {t.id} profile loaded · {t.entries} entries{"\n"}[sim] applicability evaluated at runtime in native app</pre>}
       </Card>
       <SimNotice />

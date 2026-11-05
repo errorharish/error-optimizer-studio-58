@@ -1,6 +1,6 @@
 @import "tailwindcss" source(none);
-@source "../src";
 @import "tw-animate-css";
+@source "../src";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -14,8 +14,8 @@
   --font-mono: "Cascadia Code", "JetBrains Mono", Consolas, monospace;
   --radius-sm: 4px;
   --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
+  --radius-lg: 8px;
+  --radius-xl: 8px;
   --radius-2xl: 24px;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -66,7 +66,7 @@
 }
 
 :root {
-  --radius: 12px;
+  --radius: 8px;
   --background: oklch(0.13 0.02 265); /* #050811 FigmaCanvasBg */
   --window: oklch(0.16 0.025 265); /* #080D1A FigmaWindowBg */
   --card: oklch(0.19 0.035 265); /* #0D1426 FigmaSecondaryPanel */
@@ -150,7 +150,7 @@
 @utility eo-card {
   background: var(--gradient-card);
   border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius: 8px;
   box-shadow: var(--shadow-card);
 }
 
@@ -165,7 +165,7 @@
 @utility eo-label {
   font-size: 10.5px;
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: 0;
   text-transform: uppercase;
 }
 
@@ -182,4 +182,112 @@
     opacity: 1;
     transform: none;
   }
+}
+
+/* Premium depth and motion roles, directly translatable to WPF resources. */
+:root {
+  --duration-fast: 140ms;
+  --duration-control: 180ms;
+  --duration-page: 280ms;
+  --ease-out: cubic-bezier(.2,.8,.2,1);
+  --surface-light: oklch(0.98 0.003 248 / .035);
+  --surface-glass: oklch(0.19 0.035 265 / .92);
+  --overlay-shadow: 0 30px 90px oklch(0 0 0 / .55);
+  --edge-light: color-mix(in oklab, var(--cyan) 35%, var(--border));
+  --shadow-elevated: 0 8px 20px -10px oklch(0 0 0 / .55), inset 0 1px 0 var(--surface-light);
+  --gradient-card: linear-gradient(155deg, var(--surface-light), transparent 45%), var(--surface-glass);
+}
+html[data-accent="1"] { --cyan: var(--primary-hover); }
+html[data-accent="2"] { --cyan: var(--success); }
+html[data-accent="3"] { --cyan: var(--warning); }
+html[data-accent="4"] { --cyan: var(--destructive); }
+html[data-accent="5"] { --cyan: var(--tier-debloat); }
+* { letter-spacing: 0 !important; }
+button, a, input, select, summary { -webkit-tap-highlight-color: transparent; }
+button, a { transition: color var(--duration-fast), background var(--duration-fast), border-color var(--duration-control), transform var(--duration-control), box-shadow var(--duration-control); }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
+button:active:not(:disabled), a:active { transform: translateY(1px) scale(.99); }
+input, select { min-width: 0; }
+input[type="range"] { accent-color: var(--cyan); }
+.eo-card { min-width: 0; position: relative; }
+.eo-depth { transform: perspective(1400px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)); transition: transform 260ms var(--ease-out), border-color 220ms, box-shadow 220ms; }
+.eo-depth:hover { border-color: var(--edge-light); box-shadow: var(--shadow-elevated); }
+.eo-depth:has(input:focus, select:focus, button:focus-visible) { transform: none; }
+.eo-section-title { border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+.eo-page-header { padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+.eo-page-header h1 { font-size: 24px; }
+.eo-stat { border-top: 2px solid var(--border-strong); background: linear-gradient(180deg, var(--surface-light), transparent), var(--window); }
+.eo-stat:hover { border-top-color: var(--cyan); }
+.eo-stat-grid > * { min-width: 0; }
+.eo-stat-grid .text-2xl { font-size: 24px; overflow-wrap: anywhere; }
+.eo-check[aria-checked="true"] { box-shadow: 0 0 0 3px color-mix(in oklab, var(--cyan) 12%, transparent); }
+.eo-enter { animation: eo-page-in var(--duration-page) var(--ease-out) both; }
+.eo-enter > div > * { animation: eo-section-in 320ms var(--ease-out) both; }
+.eo-enter > div > :nth-child(2) { animation-delay: 30ms; }
+.eo-enter > div > :nth-child(3) { animation-delay: 60ms; }
+.eo-enter > div > :nth-child(4) { animation-delay: 90ms; }
+.eo-modal { box-shadow: var(--overlay-shadow); animation: eo-dialog-in 200ms var(--ease-out) both; border-color: var(--border-strong); }
+.eo-overlay { animation: eo-overlay-in 180ms ease both; }
+.eo-dismiss { animation: eo-overlay-out 150ms ease both; pointer-events: none; }
+.eo-dismiss .eo-modal { animation: eo-dialog-out 150ms ease both; }
+.eo-chart path { stroke-dasharray: 1; stroke-dashoffset: 0; animation: eo-chart-draw 800ms var(--ease-out) both; }
+.eo-nav-item { isolation: isolate; }
+.eo-nav-item:hover svg { transform: translateY(-1px); }
+.eo-nav-item svg { transition: transform 180ms var(--ease-out); }
+.eo-nav-item[aria-current="page"] { box-shadow: inset 0 1px var(--surface-light); }
+.eo-console { border-top: 2px solid var(--cyan); background: var(--window); }
+.eo-console .font-mono { border-left: 2px solid var(--border-strong); }
+.eo-sticky { box-shadow: 0 -8px 25px -18px var(--background); z-index: 10; }
+.eo-quick-link { display: flex; flex-direction: column; min-height: 155px; }
+.eo-quick-link:hover { border-color: var(--cyan); }
+.eo-quick-link:first-child { background: color-mix(in oklab, var(--primary) 12%, var(--window)); border-color: var(--primary); }
+.eo-quick-link p { flex: 1; }
+.eo-data-table { overflow-x: auto; }
+.eo-data-table > .grid { min-width: 820px; }
+.eo-page-content { container-type: inline-size; }
+.eo-page-content .grid > * { min-width: 0; }
+.eo-page-content .sticky.bottom-0 { z-index: 10; flex-wrap: wrap; gap: 12px; box-shadow: var(--shadow-elevated); }
+.eo-page-content .text-subtle { color: var(--muted-foreground); }
+.eo-page-content .rounded-xl { border-radius: 8px; }
+.eo-page-content .font-mono { overflow-wrap: anywhere; }
+@keyframes eo-page-in { from { opacity: 0; transform: translateX(8px) scale(.997); } to { opacity: 1; transform: none; } }
+@keyframes eo-section-in { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+@keyframes eo-dialog-in { from { opacity: 0; transform: translateY(8px) scale(.97); } to { opacity: 1; transform: none; } }
+@keyframes eo-dialog-out { to { opacity: 0; transform: translateY(4px) scale(.98); } }
+@keyframes eo-overlay-in { from { opacity: 0; } }
+@keyframes eo-overlay-out { to { opacity: 0; } }
+@keyframes eo-chart-draw { from { stroke-dashoffset: 1; } }
+@container (max-width: 1050px) {
+  .eo-page-content .grid-cols-5 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .eo-page-content .grid-cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .eo-stat-grid { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+  .eo-page-content .eo-telemetry-split { grid-template-columns: minmax(0,1fr) !important; }
+}
+@container (max-width: 760px) {
+  .eo-page-content .grid-cols-3, .eo-page-content .grid-cols-7 { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .eo-page-content .eo-cols, .eo-page-content .eo-engine-layout, .eo-page-content .eo-profile-overview { grid-template-columns: minmax(0,1fr) !important; }
+  .eo-page-content .eo-console { position: static; }
+  .eo-page-content .grid-cols-2 { grid-template-columns: minmax(0,1fr); }
+}
+@media (max-width: 760px) {
+  .eo-shell-header { height: auto; min-height: 56px; flex-wrap: wrap; gap: 8px; padding: 10px 12px; }
+  .eo-shell-header .eo-service-label { display: none; }
+  .eo-shell-brand { font-size: 12px; }
+  .eo-shell-footer > span:last-child { display: none; }
+  .eo-shell-tabs { height: auto; min-height: 48px; padding: 6px; }
+  .eo-shell-tabs > span { display: none; }
+  .eo-shell-tabs a { padding: 8px; font-size: 10px; }
+  .eo-dock { width: 60px; }
+  .eo-dock .eo-nav-item { width: 52px; }
+  .eo-dock .eo-nav-item span { font-size: 8px; }
+  .eo-page-content { padding: 16px; }
+  .eo-page-content .sticky.bottom-0 { margin-left: -16px; margin-right: -16px; padding: 12px 16px; }
+}
+html[data-depth="flat"] .eo-depth { transform: none; }
+html[data-motion="reduced"] *, html[data-motion="reduced"] *::before, html[data-motion="reduced"] *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+html[data-motion="reduced"] .eo-depth { transform: none !important; }
+html[data-transitions="off"] .eo-enter, html[data-transitions="off"] .eo-enter > div > * { animation: none; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+  .eo-depth { transform: none !important; }
 }

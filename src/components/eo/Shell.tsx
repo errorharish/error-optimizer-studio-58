@@ -84,7 +84,7 @@ export function Shell({ children }: { children: ReactNode }) {
           <nav className="flex w-[84px] shrink-0 flex-col items-center gap-0.5 overflow-y-auto border-r border-border bg-sidebar/70 py-2">
             {dock.map((p, i) => {
               const active = slug === p.slug;
-              const sep = i > 0 && dock[i - 1].dockGroup !== p.dockGroup;
+              const sep = i > 0 && dock[i - 1]!.dockGroup !== p.dockGroup;
               return (
                 <Fragment key={p.routeKey}>
                   {sep && <div className="my-1.5 h-px w-10 bg-border" />}

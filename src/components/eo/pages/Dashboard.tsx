@@ -55,7 +55,7 @@ export function DashboardPage() {
   const s = useSeries();
   const [win, setWin] = useState("30 SEC");
   const [mode, setMode] = useState("NORMAL");
-  const last = s[s.length - 1];
+  const last = s[s.length - 1]!;
   return (
     <div className="space-y-4">
       <PageHeader

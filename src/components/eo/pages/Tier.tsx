@@ -30,8 +30,8 @@ const UEFI = [
 const BLOCKLIST = ["Microsoft.BingNews", "Microsoft.BingWeather", "Microsoft.GetHelp", "Microsoft.Getstarted", "Microsoft.MicrosoftSolitaireCollection", "Microsoft.People", "Microsoft.WindowsFeedbackHub", "Microsoft.ZuneMusic", "Microsoft.ZuneVideo", "Clipchamp.Clipchamp"];
 
 export function TierPage({ slug }: { slug: string }) {
-  const t = TIERS[slug];
-  const items = CATALOG.filter((c) => TIER_CATS[slug].includes(c.cat)).map((c, i) => ({ ...c, scope: c.cat === "SYSTEM" ? "UEFI" : "WINDOWS", done: i % 4 === 3 }));
+  const t = TIERS[slug]!;
+  const items = CATALOG.filter((c) => (TIER_CATS[slug] ?? []).includes(c.cat)).map((c, i) => ({ ...c, scope: c.cat === "SYSTEM" ? "UEFI" : "WINDOWS", done: i % 4 === 3 }));
   const [sel, setSel] = useState<Set<string>>(new Set(items.filter((i) => !i.done && i.risk !== "MEDIUM").map((i) => i.id)));
   const [scope, setScope] = useState("ALL");
   const [toolCat, setToolCat] = useState("BLOATWARE");

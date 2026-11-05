@@ -1,19 +1,20 @@
 import { useEffect, useState, type ReactNode } from "react";
+import type React from "react";
 import { cn } from "@/lib/utils";
 import type { Risk } from "@/lib/eo/data";
 import { X, ChevronDown, FlaskConical } from "lucide-react";
 import { toast } from "sonner";
 
 /* ── Card (FigmaCardStyle / GlassCard) ── */
-export function Card({ className, children, glow }: { className?: string; children: ReactNode; glow?: boolean }) {
-  return <div className={cn("eo-card p-5", glow && "eo-glow", className)}>{children}</div>;
+export function Card({ className, children, glow, style }: { className?: string | undefined; children: ReactNode; glow?: boolean | undefined; style?: React.CSSProperties | undefined }) {
+  return <div style={style} className={cn("eo-card p-5", glow && "eo-glow", className)}>{children}</div>;
 }
 
-export function Label({ children, className }: { children: ReactNode; className?: string }) {
+export function Label({ children, className }: { children: ReactNode; className?: string | undefined }) {
   return <div className={cn("eo-label text-muted-foreground", className)}>{children}</div>;
 }
 
-export function SectionTitle({ title, sub, right, badge }: { title: string; sub?: string; right?: ReactNode; badge?: ReactNode }) {
+export function SectionTitle({ title, sub, right, badge }: { title: string; sub?: string | undefined; right?: ReactNode | undefined; badge?: ReactNode | undefined }) {
   return (
     <div className="mb-4 flex items-start justify-between gap-4">
       <div>
@@ -39,7 +40,7 @@ const toneCls: Record<Tone, string> = {
   danger: "border-destructive/30 bg-destructive/10 text-destructive",
   muted: "border-border bg-elevated text-muted-foreground",
 };
-export function Badge({ tone = "muted", children, className }: { tone?: Tone; children: ReactNode; className?: string }) {
+export function Badge({ tone = "muted", children, className }: { tone?: Tone | undefined; children: ReactNode; className?: string | undefined }) {
   return (
     <span className={cn("inline-flex items-center gap-1 whitespace-nowrap rounded-[4px] border px-1.5 py-0.5 text-[9.5px] font-bold tracking-[0.1em] uppercase", toneCls[tone], className)}>
       {children}
@@ -50,7 +51,7 @@ export const riskTone = (r: Risk): Tone => (r === "SAFE" || r === "LOW" ? "succe
 export function RiskBadge({ risk }: { risk: Risk }) {
   return <Badge tone={riskTone(risk)}>{risk === "LOW" ? "LOW RISK" : risk}</Badge>;
 }
-export function DemoBadge({ label = "DEMO" }: { label?: string }) {
+export function DemoBadge({ label = "DEMO" }: { label?: string | undefined }) {
   return <Badge tone="warning">{label}</Badge>;
 }
 
@@ -63,7 +64,7 @@ const btnCls: Record<BtnVariant, string> = {
   danger: "bg-destructive/10 text-destructive border-destructive/40 hover:bg-destructive/20",
   success: "bg-success/10 text-success border-success/40 hover:bg-success/20",
 };
-export function Btn({ variant = "secondary", children, onClick, className, size = "md", title, disabled }: { variant?: BtnVariant; children: ReactNode; onClick?: () => void; className?: string; size?: "sm" | "md" | "lg"; title?: string; disabled?: boolean }) {
+export function Btn({ variant = "secondary", children, onClick, className, size = "md", title, disabled }: { variant?: BtnVariant | undefined; children: ReactNode; onClick?: () => void | undefined; className?: string | undefined; size?: "sm" | "md" | "lg" | undefined; title?: string | undefined; disabled?: boolean | undefined }) {
   return (
     <button
       title={title}
@@ -82,7 +83,7 @@ export function Btn({ variant = "secondary", children, onClick, className, size 
 }
 
 /* ── Page header (every View starts with Grid cols=*,Auto: title block + actions) ── */
-export function PageHeader({ title, sub, badges, actions, accent = "bg-cyan" }: { title: string; sub?: string; badges?: ReactNode; actions?: ReactNode; accent?: string }) {
+export function PageHeader({ title, sub, badges, actions, accent = "bg-cyan" }: { title: string; sub?: string | undefined; badges?: ReactNode | undefined; actions?: ReactNode | undefined; accent?: string | undefined }) {
   return (
     <div className="mb-5 flex flex-wrap items-start justify-between gap-4">
       <div className="flex gap-3">
@@ -101,7 +102,7 @@ export function PageHeader({ title, sub, badges, actions, accent = "bg-cyan" }: 
 }
 
 /* ── Stat strip (UniformGrid / cols=*,10,* tile rows) ── */
-export function StatTiles({ items, cols }: { items: { label: string; value: ReactNode; sub?: string; tone?: Tone }[]; cols?: number }) {
+export function StatTiles({ items, cols }: { items: { label: string; value: ReactNode; sub?: string | undefined; tone?: Tone | undefined }[]; cols?: number | undefined }) {
   const tc: Record<Tone, string> = { cyan: "text-cyan", primary: "text-primary-hover", success: "text-success", warning: "text-warning", danger: "text-destructive", muted: "text-foreground" };
   return (
     <div className="grid gap-2.5" style={{ gridTemplateColumns: `repeat(${cols ?? items.length}, minmax(0,1fr))` }}>
@@ -117,7 +118,7 @@ export function StatTiles({ items, cols }: { items: { label: string; value: Reac
 }
 
 /* ── Filter chips (rows of RadioButton/Button filters) ── */
-export function Chips({ options, value, onChange, className }: { options: string[]; value: string; onChange: (v: string) => void; className?: string }) {
+export function Chips({ options, value, onChange, className }: { options: string[]; value: string; onChange: (v: string) => void; className?: string | undefined }) {
   return (
     <div className={cn("flex flex-wrap gap-1.5", className)}>
       {options.map((o) => (
@@ -147,7 +148,7 @@ export function SearchBox({ placeholder, value, onChange }: { placeholder: strin
   );
 }
 
-export function Bar({ value, tone = "cyan", className }: { value: number; tone?: Tone; className?: string }) {
+export function Bar({ value, tone = "cyan", className }: { value: number; tone?: Tone | undefined; className?: string | undefined }) {
   const bg: Record<Tone, string> = { cyan: "bg-cyan", primary: "bg-primary", success: "bg-success", warning: "bg-warning", danger: "bg-destructive", muted: "bg-subtle" };
   return (
     <div className={cn("h-1.5 w-full overflow-hidden rounded-full bg-window", className)}>
@@ -173,7 +174,7 @@ export function Check({ on, onChange }: { on: boolean; onChange: (v: boolean) =>
 }
 
 /* ── Key / value row ── */
-export function KV({ k, v, mono }: { k: string; v: ReactNode; mono?: boolean }) {
+export function KV({ k, v, mono }: { k: string; v: ReactNode; mono?: boolean | undefined }) {
   return (
     <div className="flex items-baseline justify-between gap-3 border-b border-border/60 py-1.5 text-[12.5px] last:border-0">
       <span className="text-muted-foreground">{k}</span>
@@ -183,7 +184,7 @@ export function KV({ k, v, mono }: { k: string; v: ReactNode; mono?: boolean }) 
 }
 
 /* ── DETAILS expander: hides raw technical inventories (build report §1 rule) ── */
-export function Details({ title = "ADVANCED DETAILS", children }: { title?: string; children: ReactNode }) {
+export function Details({ title = "ADVANCED DETAILS", children }: { title?: string | undefined; children: ReactNode }) {
   const [open, setOpen] = useState(false);
   return (
     <div className="eo-card overflow-hidden">
@@ -197,7 +198,7 @@ export function Details({ title = "ADVANCED DETAILS", children }: { title?: stri
 }
 
 /* ── Modal overlay (WPF Popup/Grid overlays) ── */
-export function Modal({ open, onClose, title, sub, children, footer, width = "max-w-2xl" }: { open: boolean; onClose: () => void; title: string; sub?: string; children: ReactNode; footer?: ReactNode; width?: string }) {
+export function Modal({ open, onClose, title, sub, children, footer, width = "max-w-2xl" }: { open: boolean; onClose: () => void; title: string; sub?: string | undefined; children: ReactNode; footer?: ReactNode | undefined; width?: string | undefined }) {
   useEffect(() => {
     if (!open) return;
     const h = (e: KeyboardEvent) => e.key === "Escape" && onClose();
@@ -225,7 +226,7 @@ export function Modal({ open, onClose, title, sub, children, footer, width = "ma
 }
 
 /* ── Simulation helpers ── */
-export function SimNotice({ children }: { children?: ReactNode }) {
+export function SimNotice({ children }: { children?: ReactNode | undefined }) {
   return (
     <div className="flex items-center gap-2 rounded-lg border border-warning/30 bg-warning/5 px-3 py-2 text-[11.5px] text-warning">
       <FlaskConical className="h-3.5 w-3.5 shrink-0" />
@@ -258,7 +259,7 @@ export function useSimRun(durationMs = 2200) {
   return { progress, running: progress !== null, start };
 }
 
-export function EmptyState({ title, sub, action }: { title: string; sub: string; action?: ReactNode }) {
+export function EmptyState({ title, sub, action }: { title: string; sub: string; action?: ReactNode | undefined }) {
   return (
     <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border-strong px-6 py-10 text-center">
       <div className="eo-label text-foreground">{title}</div>
@@ -269,7 +270,7 @@ export function EmptyState({ title, sub, action }: { title: string; sub: string;
 }
 
 /* Grid with explicit fractional columns, mirroring WPF ColumnDefinitions */
-export function Cols({ cols, gap = 12, children, className }: { cols: string; gap?: number; children: ReactNode; className?: string }) {
+export function Cols({ cols, gap = 12, children, className }: { cols: string; gap?: number | undefined; children: ReactNode; className?: string | undefined }) {
   return (
     <div className={cn("grid", className)} style={{ gridTemplateColumns: cols, gap }}>
       {children}

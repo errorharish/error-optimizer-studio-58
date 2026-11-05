@@ -1,7 +1,7 @@
 // TierView.xaml — one shared layout for Normal / Pro / Ultimate / Debloat / BIOS Safe / Max Performance.
 // Debloat adds DEBLOAT TOOLBOX + blocklist editor; BIOS Safe adds MANUAL UEFI / FIRMWARE section.
 import { useState } from "react";
-import { Badge, Btn, Card, Check, Chips, Details, KV, Label, Modal, RiskBadge, SectionTitle, SimNotice, simulate } from "../kit";
+import { Badge, Btn, Card, Check, Chips, Label, Modal, RiskBadge, SectionTitle, SimNotice, simulate } from "../kit";
 import { RunModal } from "../RunModal";
 import { CATALOG, HW, TIERS, type Risk } from "@/lib/eo/data";
 import { cn } from "@/lib/utils";
@@ -115,7 +115,6 @@ export function TierPage({ slug }: { slug: string }) {
         <p className="mt-3 text-[11px] text-muted-foreground">Selected packages will be processed during Custom Bloatware Removal.</p>
       </Modal>
       <RunModal open={run} onClose={() => setRun(false)} profile={t.name} count={sel.size} />
-      <div className="hidden"><Details>{null}</Details><KV k="" v="" /></div>
     </div>
   );
 }

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { ShieldCheck } from "lucide-react";
-import { Badge, Bar, Btn, Card, Check, Chips, Cols, EmptyState, KV, Label, Modal, PageHeader, RiskBadge, SectionTitle, SimNotice, StatTiles, Toggle, simulate, useSimRun } from "../kit";
+import { Badge, Bar, Btn, Card, Check, Chips, Cols, EmptyState, Label, Modal, PageHeader, RiskBadge, SectionTitle, SimNotice, StatTiles, Toggle, simulate, useSimRun } from "../kit";
 import { cn } from "@/lib/utils";
 import { HW } from "@/lib/eo/data";
 
@@ -200,7 +200,6 @@ export function LowEndSteamPage() {
         <p className="mt-3 text-[11px] text-warning">SurfaceFlinger and Dalvik tweaks strictly require ADB connection.</p></Card>
       <Card className="flex items-center justify-between"><span className="text-xs text-muted-foreground">Ready to optimize emulator · ELIGIBLE: 3 · BLOCKED: 0</span><div className="flex gap-2"><Btn variant="primary" onClick={() => simulate("Optimize")}>Optimize</Btn><Btn variant="ghost" onClick={() => simulate("Restore")}>Restore</Btn></div></Card>
       <SimNotice />
-      <div className="hidden"><KV k="" v="" /></div>
     </div>
   );
 }
